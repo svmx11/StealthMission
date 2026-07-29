@@ -1,0 +1,22 @@
+# Unreal Engine — генерируемые/кэш-папки
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+Build/
+
+# Файлы проекта под IDE — регенерируются локально командой
+# "Generate Visual Studio project files", не должны лежать в репо
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+.vs/
+.vscode/
+.idea/
+
+# Локальные настройки редактора
+*.VC.db
+*.opensdf
+*.sdf
+*.suo
