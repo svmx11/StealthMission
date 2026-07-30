@@ -8,8 +8,8 @@ public class StealthMissionEditorTarget : TargetRules
 	public StealthMissionEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-
-		ExtraModuleNames.AddRange( new string[] { "StealthMission" } );
+        DefaultBuildSettings = BuildSettingsVersion.V5;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
+        ExtraModuleNames.AddRange( new string[] { "StealthMission" } );
 	}
 }
