@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
+#include "HealthAttributeSet.h"
 #include "GASCharacterBase.generated.h"
 
 UCLASS()
@@ -21,9 +22,36 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	class UAbilitySystemComponent* AbilitySystemComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	class UHealthAttributeSet* HealthAttributeSet;
+
+	// GameplayEffect, задающий стартовые Health/MaxHealth — назначается в Blueprint-наследнике
+	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	TSubclassOf<class UGameplayEffect> DefaultHealthEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
+	TSubclassOf<class UGameplayEffect> DamageEffect; // Blueprint GE, Modifier: Health -= SetByCaller
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetHealthPercent() const;
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	bool IsDead() const { return bIsDead; }
+
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void ApplyDamage(float Amount, FGameplayTag DamageTag);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AbilitySystem")
 	EGameplayEffectReplicationMode AscReplicationMode = EGameplayEffectReplicationMode::Mixed;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+	void OnHealthChanged(float NewPercent);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+	void OnCharacterDeath(FGameplayTag DeathTag);
+
+	void InitializeAttributes();
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,4 +70,6 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+private:
+	bool bIsDead = false;
 };
