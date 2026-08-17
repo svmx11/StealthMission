@@ -10,6 +10,14 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class EFireMode : uint8
+{
+    Single,
+    Automatic,
+    Burst
+};
+
 UCLASS()
 class STEALTHMISSION_API UWeaponDataAsset : public UPrimaryDataAsset
 {
@@ -33,6 +41,36 @@ public:
     // Класс слоя анимации — то, что раньше выбиралось через Switch on EWeaponType
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
     TSubclassOf<UAnimInstance> AnimLayerClass;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+    EFireMode FireMode;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+    float RateOfFire; // выстрелов в секунду, либо RPM
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+    float BaseDamage;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ammo")
+    int32 MagazineSize;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ammo")
+    int32 MaxReserveAmmo;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+    UAnimMontage* FireMontage;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+    UAnimMontage* ReloadMontage; // длительность = длительность монтажа
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+    FName MuzzleSocketName; // для трейса/спавна эффекта выстрела
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+    float Range = 5000.f;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+    TEnumAsByte<ECollisionChannel> TraceChannel = ECC_Visibility;
 
     // Задел под раздел 17.7 — способности оружия, пока не используются
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "WeaponDataAsset.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "WeaponManagerComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, UWeaponDataAsset*, NewWeapon);
@@ -16,7 +17,7 @@ class STEALTHMISSION_API UWeaponManagerComponent : public UActorComponent
 
 public:
     UWeaponManagerComponent();
-
+     
     UPROPERTY(BlueprintAssignable, Category = "Weapon")
     FOnWeaponChanged OnWeaponChanged;
 
@@ -41,6 +42,14 @@ protected:
     UPROPERTY()
     TObjectPtr<UStaticMeshComponent> EquippedMeshComponent;
 
+    UPROPERTY()
+    FGameplayAbilitySpecHandle GrantedFireAbilityHandle;
+
+    UPROPERTY()
+    FGameplayAbilitySpecHandle GrantedReloadAbilityHandle;
+
     void AttachWeaponMesh(UWeaponDataAsset* WeaponData);
-    void UpdateWeaponTag(UWeaponDataAsset* OldWeapon, UWeaponDataAsset* NewWeapon);	
+    void UpdateWeaponTag(UWeaponDataAsset* OldWeapon, UWeaponDataAsset* NewWeapon);
+    void GrantWeaponAbilities(UWeaponDataAsset* WeaponData);
+    void RemoveWeaponAbilities();
 };

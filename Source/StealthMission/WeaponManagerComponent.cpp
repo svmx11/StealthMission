@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 
@@ -50,6 +50,9 @@ void UWeaponManagerComponent::EquipWeapon(UWeaponDataAsset* NewWeaponData)
 
     AttachWeaponMesh(NewWeaponData);
     UpdateWeaponTag(OldWeapon, NewWeaponData);
+
+    RemoveWeaponAbilities();      // снять способности старого оружия
+    GrantWeaponAbilities(NewWeaponData); // выдать способности нового
 
     OnWeaponChanged.Broadcast(CurrentWeaponData);
 }
@@ -106,5 +109,47 @@ void UWeaponManagerComponent::UpdateWeaponTag(UWeaponDataAsset* OldWeapon, UWeap
     if (NewWeapon)
     {
         ASC->AddLooseGameplayTag(NewWeapon->WeaponTag);
+    }
+}
+
+void UWeaponManagerComponent::GrantWeaponAbilities(UWeaponDataAsset* WeaponData)
+{
+    IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(GetOwner());
+    if (!ASI) return;
+
+    UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent();
+    if (!ASC || !WeaponData) return;
+
+    if (WeaponData->FireAbility)
+    {
+        FGameplayAbilitySpec Spec(WeaponData->FireAbility, 1, INDEX_NONE, WeaponData);
+        GrantedFireAbilityHandle = ASC->GiveAbility(Spec);
+        UE_LOG(LogTemp, Warning, TEXT("Granted FireAbility: %s, valid: %d"), *GetNameSafe(WeaponData->FireAbility), GrantedFireAbilityHandle.IsValid());
+    }
+
+    if (WeaponData->ReloadAbility)
+    {
+        FGameplayAbilitySpec Spec(WeaponData->ReloadAbility, 1, INDEX_NONE, WeaponData);
+        GrantedReloadAbilityHandle = ASC->GiveAbility(Spec);
+    }
+}
+
+void UWeaponManagerComponent::RemoveWeaponAbilities()
+{
+    IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(GetOwner());
+    if (!ASI) return;
+
+    UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent();
+    if (!ASC) return;
+
+    if (GrantedFireAbilityHandle.IsValid())
+    {
+        ASC->ClearAbility(GrantedFireAbilityHandle);
+        GrantedFireAbilityHandle = FGameplayAbilitySpecHandle();
+    }
+    if (GrantedReloadAbilityHandle.IsValid())
+    {
+        ASC->ClearAbility(GrantedReloadAbilityHandle);
+        GrantedReloadAbilityHandle = FGameplayAbilitySpecHandle();
     }
 }
