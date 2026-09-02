@@ -18,6 +18,7 @@ AGASCharacterBase::AGASCharacterBase()
 	AbilitySystemComponent->SetReplicationMode(AscReplicationMode);
 
 	HealthAttributeSet = CreateDefaultSubobject<UHealthAttributeSet>(TEXT("HealthAttributeSet"));
+	AmmoAttributeSet = CreateDefaultSubobject<UAmmoAttributeSet>(TEXT("AmmoAttributeSet"));
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.0f, 90.0f);
@@ -99,8 +100,7 @@ void AGASCharacterBase::InitializeAttributes()
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(
-		DefaultHealthEffect, 1.0f, EffectContext);
+	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultHealthEffect, 1.0f, EffectContext);
 
 	if (SpecHandle.IsValid())
 	{

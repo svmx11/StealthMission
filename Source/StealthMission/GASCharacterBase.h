@@ -7,6 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "HealthAttributeSet.h"
+#include "AmmoAttributeSet.h"
 #include "GASCharacterBase.generated.h"
 
 UCLASS()
@@ -24,6 +25,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	class UHealthAttributeSet* HealthAttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	class UAmmoAttributeSet* AmmoAttributeSet;
 
 	// GameplayEffect, задающий стартовые Health/MaxHealth — назначается в Blueprint-наследнике
 	UPROPERTY(EditDefaultsOnly, Category = "AbilitySystem")
