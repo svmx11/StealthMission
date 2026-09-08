@@ -45,6 +45,9 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
     UNiagaraSystem* MuzzleFlashEffect;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
+    UNiagaraSystem* BulletTracerEffect;
+
     // Класс слоя анимации — то, что раньше выбиралось через Switch on EWeaponType
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
     TSubclassOf<UAnimInstance> AnimLayerClass;
