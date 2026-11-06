@@ -79,6 +79,10 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
     USoundBase* EmptyMagazineSound;
 
+    // Громкость шума выстрела для AI Hearing: умножает радиус слуха бота и сравнивается с LoudNoiseThreshold. 0 = выстрел не слышен
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound", meta = (ClampMin = "0.0"))
+    float NoiseLoudness = 2.0f;
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
     USoundBase* ReloadSound;
 
