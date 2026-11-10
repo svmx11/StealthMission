@@ -1,6 +1,5 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "HealthAttributeSet.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
@@ -9,6 +8,21 @@ UHealthAttributeSet::UHealthAttributeSet()
 {
 	Health = FGameplayAttributeData(100.0f);
 	MaxHealth = FGameplayAttributeData(100.0f);
+}
+
+FGameplayTag UHealthAttributeSet::ExtractDamageType(const FGameplayEffectSpec& Spec)
+{
+	static const FGameplayTag DamageRoot = FGameplayTag::RequestGameplayTag(TEXT("Damage"));
+
+	FGameplayTagContainer AllTags;
+	Spec.GetAllAssetTags(AllTags); // теги GE + добавленные через Add Asset Tag
+	if (const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags())
+	{
+		AllTags.AppendTags(*SourceTags); // сюда пишет AGASCharacterBase::ApplyDamage
+	}
+
+	const FGameplayTagContainer DamageTypes = AllTags.Filter(FGameplayTagContainer(DamageRoot));
+	return DamageTypes.Num() > 0 ? DamageTypes.First() : FGameplayTag();
 }
 
 void UHealthAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -32,36 +46,33 @@ void UHealthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
 		const float LocalDamage = GetDamage();
-		SetDamage(0.0f); // обнуляем meta-атрибут сразу, он не должен ничего хранить между применениями
+		SetDamage(0.0f); // meta-атрибут не хранит значение между применениями
 
-		UE_LOG(LogTemp, Warning, TEXT("LocalDamage received: %f"), LocalDamage);
-
-		if (LocalDamage > 0.0f)
+		if (LocalDamage > 0.0f && !bIsDead)
 		{
 			const float NewHealth = FMath::Clamp(GetHealth() - LocalDamage, 0.0f, GetMaxHealth());
 			SetHealth(NewHealth);
 
+			const FGameplayTag DamageType = ExtractDamageType(Data.EffectSpec);
+			AActor* DamageInstigator = Data.EffectSpec.GetContext().GetOriginalInstigator();
+
+			UE_LOG(LogTemp, Verbose, TEXT("%s took %.1f damage (%s)"),
+				*GetNameSafe(GetOwningActor()), LocalDamage, *DamageType.ToString());
+
 			const float Percent = GetMaxHealth() > 0.0f ? NewHealth / GetMaxHealth() : 0.0f;
 			OnHealthChanged.Broadcast(Percent);
+			OnDamageTaken.Broadcast(LocalDamage, DamageInstigator, DamageType);
 
-			if (NewHealth <= 0.0f && !bIsDead)
+			if (NewHealth <= 0.0f)
 			{
 				bIsDead = true;
-
-				FGameplayTag DeathTag;
-				const FGameplayTagContainer* SourceTags = Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
-				if (SourceTags && SourceTags->Num() > 0)
-				{
-					DeathTag = SourceTags->First();
-				}
-				OnDeath.Broadcast(DeathTag);
+				OnDeath.Broadcast(DamageType);
 			}
 		}
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		// На случай, если что-то другое (лечение, дебаг) меняет Health напрямую —
-		// просто пересчитываем процент, без повторной логики смерти
+		// Лечение/дебаг меняют Health напрямую — только пересчитать процент
 		const float Percent = GetMaxHealth() > 0.0f ? GetHealth() / GetMaxHealth() : 0.0f;
 		OnHealthChanged.Broadcast(Percent);
 	}
