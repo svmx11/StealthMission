@@ -186,6 +186,17 @@ float AGASCharacterBase::GetAimSpreadMultiplier_Implementation() const
 	return 1.0f;
 }
 
+bool AGASCharacterBase::IsCrouchingForAnim_Implementation() const
+{
+	return bIsCrouched;
+}
+
+bool AGASCharacterBase::IsWeaponRaisedForAnim_Implementation() const
+{
+	static const FGameplayTag WeaponRaisedTag = FGameplayTag::RequestGameplayTag(TEXT("State.WeaponRaised"));
+	return AbilitySystemComponent && AbilitySystemComponent->HasMatchingGameplayTag(WeaponRaisedTag);
+}
+
 UAbilitySystemComponent* AGASCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;

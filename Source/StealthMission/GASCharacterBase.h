@@ -78,6 +78,17 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Combat")
 	float GetAimSpreadMultiplier() const;
 
+	// ---------- Анимация ----------
+
+	// Присед для AnimBP. По умолчанию — штатный ACharacter::bIsCrouched. BP_Character переопределяет своим bIsCrouching
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Animation")
+	bool IsCrouchingForAnim() const;
+
+	// Оружие поднято (поза прицеливания в AnimBP). По умолчанию — есть тег State.WeaponRaised на ASC.
+	// Игрок получает тег от GA_Aim, противник — от BP_EnemyBase в Cautious/Detected
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Animation")
+	bool IsWeaponRaisedForAnim() const;
+
 	// ---------- Здоровье ----------
 
 	UFUNCTION(BlueprintPure, Category = "Health")
